@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Antworten</title>
+	<style>
+		#ausgabe {
+			display: none;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div>
+		<p>Beantworten bitte Sie folgende Fragen:</p>
+		<form id="fragen" action="daten-verarbeiten.php" method="GET">
+			Was ist der Sinn des Lebens?<br>
+			<input type="text" name="antwort1" />
+			<br>
+			Wie heißt der Polizeichef von Springfield?
+			<br>
+			<input type="text" name="antwort2" />
+			<br>
+			<input id="ajaxSubmit" type="button" value="Mit Ajax absenden" />
+		</form>
+	</div>
+
+	<div id="ausgabe">
+		<p>Sie haben folgende Antworten gegeben:<br><span id="ausgabeAntworten"></span></p>
+	</div>
+
+	<script>
+
+		let ausgabe = document.getElementById("ausgabe");
+		let ausgabeAntworten = document.getElementById("ausgabeAntworten");
+
+		function datenAnzeigen(value) {
+			ausgabeAntworten.innerHTML = value;
+			ausgabe.style.display = 'block';
+		}
+
+		function anzeigeLeeren() {
+			ausgabeAntworten.innerHTML = '';
+			ausgabe.style.display = 'none';
+		}
+
+		function anmeldung() {
+			anzeigeLeeren();
+
+			// Formulardaten erfassen
+			let antwort1 = document.getElementsByName("antwort1")[0].value;
+			let antwort2 = document.getElementsByName("antwort2")[0].value;
+
+			/* === 1. Erzeugen des AJAX-Objektes === */
+			let xhr = new XMLHttpRequest();
+
+			/* === 2. Erstellen des EventHandlers (reagiert auf Antworten des Servers) === */
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState < 4) {
+					datenAnzeigen("Laden...");
+				}
+				if (xhr.readyState == 4 && xhr.status == 200) {
+					let result = xhr.responseText;
+					datenAnzeigen(result);
+				}
+			};
+
+			/* === 3. Anfrage (mit Details zur Datenübertragung) erstellen === */
+			xhr.open("GET", "daten-verarbeiten.php?a1=" + antwort1 + "&a2=" + antwort2, true);
+
+			/* === 4. Anfrage absenden === */
+			xhr.send();
+		}
+
+		let button = document.getElementById("ajaxSubmit");
+		button.addEventListener("click", anmeldung);
+
+	</script>
+
+</body>
+
+</html>
